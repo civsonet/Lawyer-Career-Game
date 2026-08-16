@@ -11,7 +11,7 @@
   :root{
     --bg: #0a0a0b; --card: #17181c; --card-2: #1f2025;
     --border: #2a2b31; --border-soft: #202126;
-    --text: #f2f2f4; --text-dim: #9a9aa3; --text-faint: #63636b;
+    --text: #f2f2f4; --text-dim: #9a9aa3; --text-faint: #8a8a92;
     --accent: #d1a53d; --accent-soft: rgba(209,165,61,.14); --accent-text: #17181c;
     --good: #4fb473; --bad: #e2584f;
     --font-display: 'Rubik', sans-serif; --font-body: 'Heebo', sans-serif;
@@ -24,6 +24,8 @@
   .brand .eyebrow{ font-size:11px; letter-spacing:.2em; color:var(--accent); text-transform:uppercase; font-weight:700; margin-bottom:6px;}
   .brand h1{ font-family:var(--font-display); font-weight:900; font-size:26px; margin:0; }
   .brand .tag{ color:var(--text-dim); font-size:13px; margin-top:5px; }
+  .disclaimer-short{ font-size:11px; color:var(--text-faint); line-height:1.5; text-align:center; margin:18px auto 0; padding:0 10px; max-width:480px; }
+  .disclaimer-full{ font-size:10.5px; color:var(--text-faint); line-height:1.6; text-align:center; margin-top:16px; padding:0 4px; }
   .card{ background:var(--card); border:1px solid var(--border); border-radius:18px; padding:20px 18px; margin-bottom:14px; }
   h2.card-title{ font-family:var(--font-display); font-size:17px; font-weight:800; margin:0 0 4px; }
   p.card-sub{ font-size:13px; color:var(--text-dim); margin:0 0 16px; line-height:1.55; }
@@ -51,6 +53,7 @@
   .link-btn{ background:none; border:none; color:var(--accent); font-family:var(--font-body); font-size:13px; font-weight:600; cursor:pointer; }
   .player-card{ background:linear-gradient(160deg, var(--card-2), var(--card)); border:1px solid var(--border); border-radius:18px; padding:18px; margin-bottom:14px; }
   .player-top{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
+  .player-name{ font-size:11px; color:var(--accent); font-weight:700; margin-bottom:2px; }
   .player-role{ font-family:var(--font-display); font-weight:800; font-size:19px; }
   .player-place{ font-size:12.5px; color:var(--text-dim); margin-top:2px; }
   .year-badge{ background:var(--accent-soft); color:var(--accent); font-size:11.5px; font-weight:700; padding:5px 10px; border-radius:20px; white-space:nowrap; }
@@ -118,8 +121,10 @@
     <div class="eyebrow">סימולטור קריירה</div>
     <h1>⚖ כמה עו״ד</h1>
     <div class="tag" style="margin-top:-4px;">קריירה משפטית למשפטן/ית המתחיל/ה — מהלימודים ועד שהגורל (והוועדות) יגידו אחרת</div>
+    <button id="help-btn" class="link-btn" style="display:block; margin:8px auto 0;">❓ איך משחקים</button>
   </div>
   <div id="app"></div>
+  <div class="disclaimer-short">בדיוני ולבידור בלבד — אינו מהווה ייעוץ משפטי.</div>
 </div>
 
 <script>
@@ -205,6 +210,13 @@ const ORIGINS = [
     training:'מינימלית, יש יותר מדי עבודה בשביל זה', culture:'שליחות, שחיקה, ותחושת משמעות אמיתית',
     offerText:'"אנחנו רוצים אותך אצלנו לתמיד," אומרת מנהלת העמותה. "התקציב עוד לא אושר, אבל הכוונות טובות."',
     noOfferText:'תרומה גדולה שהובטחה לא הגיעה. התקן שלך בוטל. הערכים שלך נשארו שלמים, לפחות.' },
+  { id:'regulatory', name:'יחידת סמך / רגולציה',
+    internDesc:'רשות התחרות, משרד התקשורת, רשות ניירות ערך, רשות החשמל — כולן מחפשות מתמחים כל שנה. את/ה נוחת/ת באחת מהן, עם כרטיס עובד ממשלתי וטופס 101 שאף אחד לא הסביר לך איך למלא.',
+    start:{rep:13,money:-1000,sanity:56,network:19}, offerChance:.45, formalProcess:true,
+    hours:'42–47 שעות שבועיות', responsibility:'גבוהה — החלטות שמשפיעות על שוק שלם',
+    training:'מובנית אך ביורוקרטית', culture:'רצינית, איטית, ולפעמים מפתיעה בהשפעה שלה',
+    offerText:'ועדת המכרזים אישרה משרה קבועה — ברוכים הבאים לשירות המדינה.',
+    noOfferText:'התקן קוצץ ברגע האחרון בוועדת התקציבים. גם הרגולטורים מוסדרים על ידי מישהו.' },
 ];
 
 // monthly salaries per level
@@ -215,6 +227,7 @@ const WORKPLACES = {
   bagatz:       { name:'בג״צים — יחידה ציבורית', hasDept:false, ladder:['מתמחה','עו״ד בתחום הציבורי','עו״ד בכיר/ה','ראש/ת תחום','מנהל/ת משפטית ארצית'], salaries:[6000,9500,13000,16500,20000] },
   ngo:          { name:'עמותה', hasDept:false, ladder:['מתמחה','עו״ד בעמותה','עו״ד בכיר/ה בעמותה','מנהל/ת משפטית','מנכ״ל/ית העמותה'], salaries:[5000,7500,10500,13500,16500] },
   bituach_leumi:{ name:'ביטוח לאומי', hasDept:false, ladder:['מתמחה','פקיד/ה תביעות משפטי/ת','עו״ד בביטוח הלאומי','עו״ד בכיר/ה','ראש/ת ענף משפטי'], salaries:[6500,10500,13000,15500,18500] },
+  regulatory:   { name:'יחידת סמך / רגולציה', hasDept:false, ladder:['מתמחה','רגולטור/ית','רגולטור/ית בכיר/ה','ראש/ת אגף','יו״ר הרשות'], salaries:[6000,11000,14500,19000,29000] },
   court_supreme:{ name:'לשכת בית המשפט העליון', hasDept:false, clerkship:true, ladder:['מתמחה משפטי/ת','רפרנט/ית משפטי/ת בכיר/ה'], salaries:[6500,11500] },
   court_district:{name:'בית משפט מחוזי / שלום', hasDept:false, clerkship:true, ladder:['מתמחה משפטי/ת','רפרנט/ית משפטי/ת בכיר/ה'], salaries:[6000,9500] },
   judge:        { name:'מערכת השיפוט', hasDept:false, ladder:['שופט/ת שלום','שופט/ת מחוזי/ת','שופט/ת בית המשפט העליון'], salaries:[46000,55000,64000] },
@@ -246,7 +259,7 @@ function workplaceCategory(wp){
   if(wp==='politics') return 'politics';
   if(wp==='academic') return 'academic';
   if(wp==='corporate') return 'corporate';
-  if(['bagatz','ngo','bituach_leumi'].includes(wp)) return 'public';
+  if(['bagatz','ngo','bituach_leumi','regulatory'].includes(wp)) return 'public';
   if(['court_supreme','court_district'].includes(wp)) return 'clerk';
   if(wp==='mediator') return 'mediator';
 }
@@ -310,7 +323,7 @@ const DECISIONS = [
         {p:.4, text:'קיבלת מלגה חלקית! נוסעים בזול יחסית.', d:{rep:8,network:6,money:-15000}},
         {p:.6, text:'לא קיבלת מלגה. נשארים בארץ.', d:{sanity:-3}} ]},
     ]},
-  { id:'guest_lecture', minYear:3, excludeWorkplace:['academic'], title:'הזמנה להעביר קורס', situation:'ביקשו ממך להעביר קורס חד-פעמי בפקולטה למשפטים — בלי לעזוב את התפקיד הנוכחי.',
+  { id:'guest_lecture', minYear:9, excludeWorkplace:['academic'], title:'הזמנה להעביר קורס', situation:'ביקשו ממך להעביר קורס חד-פעמי בפקולטה למשפטים — בלי לעזוב את התפקיד הנוכחי.',
     options:[
       { label:'לקחת את זה', outcomes:[
         {p:.7, text:'הסטודנטים אהבו, וגילית שקצת נהנה/ית ללמד.', d:{rep:5,sanity:-3,money:2000}},
@@ -346,6 +359,12 @@ const DECISIONS = [
         {p:.7, text:'פרק אחד מוצלח, בלי מחויבות מתמשכת.', d:{publicRep:8,network:3}},
         {p:.3, text:'הפרק היחיד שלך הוא בדיוק זה שההייטרים בחרו לנתח.', d:{publicRep:-8,sanity:-5}} ]},
     ]},
+  { id:'wealth_choice', eligible:(s)=> s.money>=800000 && !s.flags.wealthChoiceDone, title:'סוף סוף אפשר להרשות לעצמך', situation:'יש מספיק בחשבון כדי לעשות משהו גדול. השאלה היא מה.',
+    options:[
+      { label:'לקנות דירה', outcomes:[{p:1, text:'סוף סוף בעלים. גם אם זה עוד 25 שנות משכנתא.', d:{money:-500000,sanity:10}, flag:'wealthChoiceDone'}]},
+      { label:'להמשיך לחסוך — אף פעם לא באמת "מספיק"', outcomes:[{p:1, text:'הביטחון הכלכלי חשוב לך יותר מהסמל.', d:{sanity:-2}, flag:'wealthChoiceDone'}]},
+      { label:'לפנק את עצמך בטיול גדול ולתכנן אחר כך', outcomes:[{p:1, text:'הטיול היה מדהים. התכנון נדחה לפעם אחרת.', d:{money:-60000,sanity:12}, flag:'wealthChoiceDone'}]},
+    ]},
   { id:'money_decision', minYear:4, title:'מה עושים עם הכסף?', situation:'יש קצת עודף בחשבון. אפשר לתת לו לשבת שם, או לעשות איתו משהו.',
     options:[
       { label:'להשקיע במדדים ולשכוח מזה לכמה שנים', outcomes:[
@@ -353,6 +372,120 @@ const DECISIONS = [
         {p:.35, text:'ירידה זמנית. "זה רק על הנייר," את/ה חוזר/ת ואומר/ת לעצמך.', d:{money:-6000,sanity:-3}} ]},
       { label:'לתרום ולקבל קצת יחסי ציבור', outcomes:[{p:1, text:'תרומה מכובדת, אזכור קטן בעיתון המקומי.', d:{money:-8000,rep:6}}]},
       { label:'לפנק את עצמך — נסיעה, שיפוץ, משהו', outcomes:[{p:1, text:'לא חכם פיננסית. מאוד חכם נפשית.', d:{money:-10000,sanity:10}}]},
+    ]},
+  { id:'annual_bonus', categories:['firm','public','corporate'], minYear:3, title:'עונת הבונוסים', situation:'הגיע הזמן לבונוס השנתי. השאלה היא כמה, ומתי הנהלת החשבונות בעצם תעביר אותו בפועל.',
+    options:[
+      { label:'לצפות לבונוס גדול על שנה טובה', outcomes:[
+        {p:.15, text:'שלוש משכורות! הנהלת החשבונות עוד תעביר את זה, בערך, ברבעון הבא.', d:{sanity:12,rep:3}},
+        {p:.35, text:'משכורת וחצי. פחות ממה שקיווית, יותר ממה שציפית בסתר.', d:{sanity:6}},
+        {p:.35, text:'חצי משכורת. "השנה הייתה מאתגרת לכולם," מסביר לך מישהו שקיבל בונוס גדול משמעותית.', d:{sanity:-4}},
+        {p:.15, text:'בונוס "בשווה כסף" — שובר לחנות שמעולם לא שמעת עליה.', d:{sanity:-6}} ]},
+      { label:'להתמקד בעבודה ולא לצפות לכלום', outcomes:[{p:1, text:'שתי משכורות בונוס הגיעו בכל זאת, בול כשכבר שכחת שציפית להן.', d:{sanity:4}}]},
+    ]},
+  { id:'esti_kriaf_nemesis', categories:['firm','public'], minYear:4, title:'אסתי קריאף מטיפה לך מוסר', situation:'אסתי קריאף, שידועה כ"מצפון המקצוע", תופסת אותך במסדרון בית המשפט ונותנת לך הרצאה על אתיקה מקצועית — באותו השבוע שהתברר שהיא עצמה הגישה שתי חוות דעת סותרות בשני תיקים מקבילים, בתשלום.',
+    options:[
+      { label:'להעיר לה על הצביעות, בנימוס', outcomes:[
+        {p:.5, text:'היא הביטה בך כאילו את/ה לא "מבין/ה את המורכבות", וצעדה משם בראש מורם.', d:{sanity:-2,rep:1}},
+        {p:.5, text:'היא "נעלבה" בפומבי וסיפרה לכולם שהתקפת אותה. שניים האמינו לה.', d:{rep:-2,sanity:-2}} ]},
+      { label:'להנהן בנימוס ולהימלט', outcomes:[{p:1, text:'עוד חמש דקות של חיוך מנומס שלא תחזור/י עליהן לעולם.', d:{sanity:-1}}]},
+      { label:'לתעד את הדברים בשקט, ליתר ביטחון', outcomes:[{p:1, text:'לא השתמשת בזה. אבל זה שם, ברשומות שלך, "ליתר ביטחון".', d:{sanity:1}}]},
+    ]},
+  { id:'bligal_app', categories:['firm'], minYear:2, title:'האפליקציה מנהלת אותך', situation:'המשרד עבר לתוכנת ניהול "בליגל" — שמתריעה, מזכירה, ומייעצת מתי להגיש כל מסמך. נוח, אבל גם קצת מפחיד כמה שהיא כבר יודעת על סדר היום שלך.',
+    options:[
+      { label:'לסמוך על התוכנה במאה אחוז', outcomes:[
+        {p:.7, text:'התראה בזמן הצילה אותך מלפספס מועד הגשה קריטי.', d:{sanity:5,rep:3}},
+        {p:.3, text:'התוכנה טעתה בתזכורת אחת. אי אפשר באמת להאשים אותה, אבל ניסית.', d:{rep:-4,sanity:-5}} ]},
+      { label:'להשתמש בה כגיבוי בלבד, ולבדוק הכל גם ידנית', outcomes:[{p:1, text:'כפול עבודה, אבל שקט נפשי.', d:{sanity:-3}}]},
+      { label:'להתעלם ולהמשיך ביומן הנייר הישן שלך', outcomes:[
+        {p:.5, text:'הצוות הצעיר מסתכל עליך כמו על מאובן, אבל לא פספסת כלום.', d:{rep:2}},
+        {p:.5, text:'פספסת עדכון חשוב שכולם קיבלו באפליקציה.', d:{rep:-5,sanity:-4}} ]},
+    ]},
+  { id:'tv_series_dream', minYear:6, title:'החלום מהתואר', situation:'החבר/ה הכי טוב/ה שלך מהלימודים מתקשר/ת בהתרגשות: "יש לי רעיון לסדרה שתשנה את הטלוויזיה. בוא/י נעזוב הכל ונכתוב את זה ביחד."',
+    options:[
+      { label:'לעזוב הכל ולכתוב את הסדרה איתו/ה', outcomes:[{p:1, text:'עזבתם הכל וכתבתם. זו הפכה לסדרה המצליחה בהיסטוריה. מיליון שקלים, תהילת עולם, וכל מי שהכיר אתכם "תמיד ידע".', d:{}, instantEnd:'tv_series_win'}]},
+      { label:'להישאר במשפטים, זה סיכון גדול מדי', outcomes:[{p:1, text:'אמרת לא. יום אחד תראה/י את השם שלו/שלה על מסך גדול ותהרהר/י "מה היה קורה אם".', d:{sanity:-3}}]},
+    ]},
+  { id:'startup_pivot', categories:['corporate'], title:'פיבוט', situation:'המנכ״ל מודיע בפגישת all-hands שהחברה "פועטת" למודל עסקי חדש לגמרי. אתה צריך לנסח את כל החוזים מחדש, אתמול.',
+    options:[
+      { label:'לצלול פנימה ולעבוד את הסופ״ש', outcomes:[
+        {p:.6, text:'הספקת. המנכ״ל התרשם.', d:{rep:6,sanity:-8}},
+        {p:.4, text:'הספקת, בערך. שני חוזים חזרו עם טעויות.', d:{rep:-4,sanity:-8}} ]},
+      { label:'לדרוש עוד שבוע ולעמוד על זה', outcomes:[
+        {p:.5, text:'קיבלת את השבוע. עבודה טובה יותר יצאה מזה.', d:{rep:4,sanity:2}},
+        {p:.5, text:'"אין זמן," אמרו לך, וזה לא ממש עזר.', d:{sanity:-6}} ]},
+    ]},
+  { id:'retirement_replacement', categories:['judge'], title:'מי ימלא את מקומך', situation:'שופט/ת ותיק/ה פורש/ת, ואתה חלק מהוועדה הבלתי רשמית ש"ממליצה" למי שממנה בפועל.',
+    options:[
+      { label:'להמליץ על מי שהכי מוכשר/ת, גם אם לא הכי מקושר/ת', outcomes:[{p:1, text:'עמדת מאחורי העיקרון. לא כולם התרשמו.', d:{rep:5,network:-3}}]},
+      { label:'להמליץ על מי שיזכור/תזכור לך את הטובה', outcomes:[
+        {p:.5, text:'זה עבד. יש לך עכשיו בעל חוב.', d:{network:6,rep:-2}},
+        {p:.5, text:'זה התפוצץ בפומבי כ"פוליטיקה שיפוטית".', d:{rep:-8,sanity:-6}} ]},
+    ]},
+  { id:'clerk_management', categories:['judge'], title:'מלחמת רפרנטים', situation:'שני הרפרנטים שלך רבים על מי כותב את הטיוטה לתיק הגדול השבוע.',
+    options:[
+      { label:'לחלק ביניהם בצורה שווה', outcomes:[{p:1, text:'שלום בית. גם קצת בזבוז זמן בתיאום.', d:{sanity:-2}}]},
+      { label:'לתת לטוב/ה מביניהם לקחת את זה', outcomes:[
+        {p:.6, text:'התיק יצא מצוין. השני נעלב.', d:{rep:4,network:-3}},
+        {p:.4, text:'זה יצר תחרות לא בריאה בלשכה.', d:{sanity:-5}} ]},
+    ]},
+  { id:'plea_bargain_pressure', categories:['judge'], title:'לחץ על עסקת טיעון', situation:'הפרקליטות והסנגוריה מגיעות עם עסקת טיעון שנראית לך קלה מדי לנסיבות המקרה.',
+    options:[
+      { label:'לדחות את העסקה ולדרוש בירור נוסף', outcomes:[
+        {p:.5, text:'התגלו עובדות נוספות שהצדיקו את הספק שלך.', d:{rep:8,sanity:-5}},
+        {p:.5, text:'הצדדים כעסו על העיכוב המיותר.', d:{network:-4,sanity:-6}} ]},
+      { label:'לאשר את העסקה כמוצע', outcomes:[{p:1, text:'התיק נסגר מהר. משהו בזה עדיין לא הרגיש נכון.', d:{sanity:-4}}]},
+    ]},
+  { id:'expert_witness_dilemma', categories:['judge'], title:'עדי מומחה סותרים', situation:'שני מומחים בתחום זהה מגיעים למסקנות הפוכות לגמרי באותו תיק.',
+    options:[
+      { label:'למנות מומחה שלישי מטעם בית המשפט', outcomes:[{p:1, text:'עיכוב בתיק, אבל תמונה ברורה יותר בסוף.', d:{rep:5,sanity:-4}}]},
+      { label:'להכריע בעצמך על בסיס מהימנות העדים', outcomes:[
+        {p:.5, text:'ההכרעה שלך עמדה במבחן הערעור.', d:{rep:6}},
+        {p:.5, text:'ערכאת הערעור לא הסכימה עם הניתוח שלך.', d:{rep:-6,sanity:-5}} ]},
+    ]},
+  { id:'judicial_conference_abroad', categories:['judge'], title:'כנס שופטים בינלאומי', situation:'הזמנה להשתתף בחילופי שופטים בין-לאומי — שבוע בחו״ל ללימוד שיטות שיפוט אחרות.',
+    options:[
+      { label:'לנסוע', outcomes:[{p:1, text:'פרספקטיבה מרעננת, וקצת געגוע הביתה.', d:{rep:5,network:6,sanity:5}}]},
+      { label:'לוותר, יש עומס תיקים', outcomes:[{p:1, text:'התיקים לא חיכו. גם ההזדמנות לא תחזור בקרוב.', d:{sanity:-3}}]},
+    ]},
+  { id:'courtroom_disruption', categories:['judge'], title:'הפרעה באולם', situation:'צד לדיון מתפרץ, צועק, ומסרב להירגע למרות אזהרותיך.',
+    options:[
+      { label:'להוציא אותו/ה מהאולם', outcomes:[{p:1, text:'סדר הושב על כנו. גם קצת מתח נשאר באוויר.', d:{rep:3,sanity:-4}}]},
+      { label:'להפסיק את הדיון ולתת הפסקה', outcomes:[
+        {p:.6, text:'ההפסקה עזרה לכולם להירגע.', d:{sanity:2}},
+        {p:.4, text:'זה נתפס כחולשה מצדך.', d:{rep:-4}} ]},
+    ]},
+  { id:'recusal_request', categories:['judge'], title:'בקשת פסלות', situation:'צד לדיון מגיש בקשה לפוסלך מלדון בתיק, בטענה לדעה קדומה.',
+    options:[
+      { label:'לדחות את הבקשה ולהמשיך', outcomes:[
+        {p:.6, text:'הבקשה נדחתה גם בערכאה גבוהה יותר.', d:{rep:4,sanity:-3}},
+        {p:.4, text:'הערכאה הגבוהה קיבלה את הטענה. לא נעים.', d:{rep:-8,sanity:-8}} ]},
+      { label:'לפסול את עצמך מרצון, ליתר ביטחון', outcomes:[{p:1, text:'מישהו אחר ידון בתיק. שקט נפשי, מחיר קטן בגאווה.', d:{sanity:4,rep:-2}}]},
+    ]},
+  { id:'legal_textbook_invitation', categories:['judge'], title:'הזמנה לכתוב ספר לימוד', situation:'הוצאה משפטית מבקשת שתכתוב/י פרק בספר לימוד מוביל בתחומך.',
+    options:[
+      { label:'להסכים ולהשקיע בזה ברצינות', outcomes:[{p:1, text:'הפרק יצא מצוין. גם לקח נתח נכבד מהזמן הפנוי שלך.', d:{rep:8,sanity:-6}}]},
+      { label:'לסרב, אין זמן', outcomes:[{p:1, text:'מישהו אחר יכתוב את הפרק הזה.', d:{sanity:2}}]},
+    ]},
+  { id:'sentencing_guidelines_debate', categories:['judge'], title:'דיון על מדיניות ענישה', situation:'ועדה מקצועית מבקשת את עמדתך על הצעה להחמיר קווים מנחים לענישה בעבירות מסוימות.',
+    options:[
+      { label:'לתמוך בהחמרה', outcomes:[
+        {p:.5, text:'עמדתך התקבלה בברכה על ידי חלק מהעמיתים.', d:{rep:3,network:3}},
+        {p:.5, text:'עמיתים אחרים חושבים שזה פוגע בשיקול הדעת השיפוטי.', d:{network:-4}} ]},
+      { label:'להתנגד ולהזהיר מפגיעה בשיקול דעת שיפוטי', outcomes:[
+        {p:.5, text:'עמדתך זכתה להערכה מקצועית רחבה.', d:{rep:5}},
+        {p:.5, text:'נתפסת כ"רכה מדי" בעיני חלק מהציבור.', d:{publicRep:-5}} ]},
+    ]},
+  { id:'judicial_burnout', categories:['judge'], title:'עומס תיקים בלתי אפשרי', situation:'רשימת התיקים שלך ארוכה משנה שלמה של עבודה. משהו חייב להיפרץ.',
+    options:[
+      { label:'לעבוד שעות נוספות ולדחוף קדימה', outcomes:[{p:1, text:'התקדמת ברשימה. הגוף שלח כמה אזהרות שהתעלמת מהן.', d:{sanity:-12,rep:3}}]},
+      { label:'לבקש סיוע נוסף מהנהלת בתי המשפט', outcomes:[
+        {p:.5, text:'קיבלת עוד רפרנט/ית זמני/ת.', d:{sanity:6}},
+        {p:.5, text:'"אין תקציב כרגע", ענו לך.', d:{sanity:-6}} ]},
+    ]},
+  { id:'young_lawyer_mentorship', categories:['judge'], title:'עורך/ת דין צעיר/ה שמזכיר/ה לך את עצמך', situation:'עורך/ת דין צעיר/ה ולחוץ/ה מופיע/ה בפניך, עושה טעויות מתחילים קלאסיות. משהו בזה מזכיר לך את עצמך.',
+    options:[
+      { label:'לתת לו/לה הזדמנות נוספת ברוח טובה', outcomes:[{p:1, text:'הוא/היא התאושש/ה בהמשך הדיון. רגע נחמד.', d:{sanity:4,publicRep:3}}]},
+      { label:'להישאר קפדני/ת כרגיל, זה לא באמת עניינך', outcomes:[{p:1, text:'שמרת על עקביות מקצועית. גם קצת קר.', d:{rep:2}}]},
     ]},
   { id:'judge_offer', minYear:4, isMajorMove:true, minRep:35, title:'הצעה למינוי שיפוטי', situation:'הוועדה לבחירת שופטים פנתה אליך. יש מקום פנוי לשופט/ת שלום.',
     excludeWorkplace:['judge'],
@@ -379,7 +512,7 @@ const DECISIONS = [
       { label:'לסרב, האופציות זה קזינו', outcomes:[{p:1, text:'שקט נפשי יקר ערך.', d:{sanity:3}}]},
       { label:'לנהל אותם כלקוח חיצוני בלבד', outcomes:[{p:1, text:'שכ״ט קבוע, בלי הימור על ה-exit.', d:{money:10000,network:5}}]},
     ]},
-  { id:'academic_offer', minYear:3, isMajorMove:true, title:'הצעה להוראה קבועה', situation:'האוניברסיטה מבקשת שתצטרף/י לסגל בתקן מלא — לא הרצאת אורח, קריירה שנייה.',
+  { id:'academic_offer', minYear:14, isMajorMove:true, title:'הצעה להוראה קבועה', situation:'האוניברסיטה מבקשת שתצטרף/י לסגל בתקן מלא — לא הרצאת אורח, קריירה שנייה.',
     excludeWorkplace:['academic'],
     options:[
       { label:'לקבל', outcomes:[{p:1, text:'אתם כעת "ד״ר" בטעות בפי הסטודנטים, שוב ושוב.', d:{rep:8,money:-2000,sanity:5}, moveTo:{workplace:'academic',level:0}}]},
@@ -404,9 +537,9 @@ const DECISIONS = [
     ]},
   { id:'choose_mediator', categories:['firm','public'], minYear:3, title:'בחירת מגשר ללקוח', situation:'שני הצדדים בתיק מסכימים לנסות גישור. השאלה היא רק — עם מי?',
     options:[
-      { label:'גבריאלי — איתו תמיד מגיעים לפשרה. השאלה היא רק באיזה מחיר', outcomes:[
+      { label:'רפאלי — איתו תמיד מגיעים לפשרה. השאלה היא רק באיזה מחיר', outcomes:[
         {p:.5, text:'פשרה מהירה ואלגנטית. המחיר: כואב, אבל נסבל.', d:{money:-6000,rep:4,sanity:2}},
-        {p:.3, text:'פשרה הושגה — אחרי שגבריאלי "התייעץ" עם שותפו, שגם הוא חייב שעות.', d:{money:-13000,rep:5,sanity:-3}},
+        {p:.3, text:'פשרה הושגה — אחרי שרפאלי "התייעץ" עם שותפו, שגם הוא חייב שעות.', d:{money:-13000,rep:5,sanity:-3}},
         {p:.2, text:'פשרה הושגה, אבל שכר הטרחה שלו כמעט עלה על מה שהלקוח חסך בגישור.', d:{money:-18000,rep:2,sanity:-6}} ]},
       { label:'מגשר צעיר וזול, פחות ניסיון', outcomes:[
         {p:.6, text:'עבד מצוין, וגם זול.', d:{money:2000,rep:2}},
@@ -422,6 +555,10 @@ const DECISIONS = [
         {p:.6, text:'התוצאות מדברות בעד עצמן — קידום.', d:{sanity:2}, levelUp:1},
         {p:.4, text:'עבודה טובה לא תמיד מספיקה. לא הפעם.', d:{sanity:-5}} ]},
       { label:'להשקיע בקשרים במקום בתוצאות', outcomes:[{p:1, text:'לא קודמת/ה, אבל כולם מכירים אותך במסדרון.', d:{network:8,rep:-2}}]},
+      { label:'לוותר על המקום הזה ולנסות מזל בפרקטיקה פרטית', outcomes:[
+        {p:.4, text:'"מותר הכל ושות׳" קלטו אותך. ברוך/ה הבא/ה למרתון.', d:{sanity:-3}, moveTo:{workplace:'mega_firm',level:1}},
+        {p:.35, text:'"הרצוג שועל נאמן" קלטו אותך, בתנאים סבירים.', d:{sanity:-2}, moveTo:{workplace:'large_firm',level:1}},
+        {p:.25, text:'"קטנצקי ושות׳" קלטו אותך בחום.', d:{sanity:2}, moveTo:{workplace:'small_firm',level:1}} ]},
     ]},
 
   // firm
@@ -531,7 +668,7 @@ const DECISIONS = [
       { label:'להציע לחלוק את התיק', outcomes:[{p:1, text:'פתרון דיפלומטי.', d:{deptRank:4,network:4}}]},
       { label:'לתת למישהו/י אחר/ת לקחת הפעם', outcomes:[{p:1, text:'קרדיט קטן יותר, לילה שקט יותר.', d:{deptRank:-3,sanity:6}}]},
     ]},
-  { id:'firm_merger_rumor', categories:['firm'], eligible:(s)=>!!WORKPLACES[s.workplace].hasDept, title:'שמועת מיזוג', situation:'שמועה עוברת במסדרונות: המשרד נמצא בשיחות מיזוג עם משרד מתחרה.',
+  { id:'firm_merger_rumor', categories:['firm'], eligible:(s)=>!!WORKPLACES[s.workplace].hasDept, title:'שמועת מיזוג', situation:'שמועה עוברת במסדרונות: המשרד נמצא בשיחות מיזוג עם "גולדפיש ושות׳" — שכבר שכחו שהם דיברו איתכם על זה גם לפני חצי שנה.',
     options:[
       { label:'לתמוך במיזוג בפומבי', outcomes:[
         {p:.5, text:'המיזוג יצא לפועל. המשרד המאוחד מדורג גבוה יותר.', d:{firmRank:15,money:5000}},
@@ -561,7 +698,7 @@ const DECISIONS = [
         {p:.6, text:'הוא היה צעד אחד לפניך, כרגיל.', d:{sanity:-8,money:-3000}} ]},
       { label:'להישאר מקצועי ולהתעלם מהפרובוקציות', outcomes:[{p:1, text:'לא נתת לו את הסיפוק. גם לא ניצחת בגדול.', d:{sanity:2}}]},
     ]},
-  { id:'client_poaching', categories:['firm'], depts:['commercial'], minLevel:2, title:'גניבת לקוח', situation:'לקוח גדול פונה אליך ישירות: "אני עובר איתך למשרד הבא, אם תבוא/י."',
+  { id:'client_poaching', categories:['firm'], depts:['commercial'], minLevel:2, title:'גניבת לקוח', situation:'לקוח גדול פונה אליך ישירות: "אני עובר איתך ל\'גרוס, טוחנים ושות\'\', אם תבוא/י."',
     options:[
       { label:'לקחת את הלקוח ולעבור', outcomes:[
         {p:.6, text:'המעבר הצליח, הלקוח איתך, המוניטין שלך גדל.', d:{money:15000,rep:8,network:-5}},
@@ -571,7 +708,7 @@ const DECISIONS = [
         {p:.5, text:'עבד. גם הלקוח, גם המשרד, מרוצים.', d:{rep:5,money:3000}},
         {p:.5, text:'הלקוח עזב בכל מקרה, בלעדיך.', d:{sanity:-5}} ]},
     ]},
-  { id:'pro_bono_case', categories:['firm','public'], excludeWorkplace:['bituach_leumi'], title:'תיק פרו בונו', situation:'מבקשים ממך לקחת תיק פרו בונו עם פוטנציאל תקדימי, אבל אפס תשלום.',
+  { id:'pro_bono_case', categories:['firm','public'], excludeWorkplace:['bituach_leumi','regulatory'], title:'תיק פרו בונו', situation:'מבקשים ממך לקחת תיק פרו בונו עם פוטנציאל תקדימי, אבל אפס תשלום.',
     options:[
       { label:'לקחת את התיק', outcomes:[
         {p:.55, text:'ניצחת, ופסק הדין מצוטט בכל מקום.', d:{rep:12,sanity:-6,money:-3000}},
@@ -581,7 +718,7 @@ const DECISIONS = [
     ]},
   { id:'tech_disruption', categories:['firm'], title:'AI במשרד', situation:'המשרד מכניס כלי AI לניתוח חוזים. חלק מהמתמחים כבר שואלים אם עוד יהיה להם תפקיד.',
     options:[
-      { label:'לאמץ את הכלי באנטוזיאזם', outcomes:[{p:1, text:'את/ה עכשיו "המומחה/ית לטכנולוגיה" של המשרד.', d:{rep:4,sanity:-3}}]},
+      { label:'לאמץ את הכלי בהתלהבות', outcomes:[{p:1, text:'את/ה עכשיו "המומחה/ית לטכנולוגיה" של המשרד.', d:{rep:4,sanity:-3}}]},
       { label:'להתנגד ולהתעקש על עבודה ידנית', outcomes:[
         {p:.6, text:'התיקים שלך עדיין הכי מדויקים במשרד.', d:{rep:3}},
         {p:.4, text:'נראית קצת כמו מאובן.', d:{rep:-4}} ]},
@@ -684,6 +821,86 @@ const DECISIONS = [
       { label:'להציע ניסוח ביניים', outcomes:[
         {p:.7, text:'פתרון של מבוגר אחראי.', d:{rep:6}},
         {p:.3, text:'המנכ״ל עדיין לא מרוצה.', d:{network:-3}} ]},
+    ]},
+  { id:'stock_options_question', categories:['corporate'], title:'שאלות על אופציות', situation:'עובד/ת מודאג/ת שואל/ת אותך בפרוזדור אם "האופציות שלו בכלל שוות משהו". זה לא בדיוק תפקידך, אבל את/ה כבר שם.',
+    options:[
+      { label:'להסביר בכנות את הסיכונים', outcomes:[{p:1, text:'הוא/היא העריכ/ה את הכנות, גם אם זה לא מה שרצה לשמוע.', d:{rep:4,sanity:-2}}]},
+      { label:'להפנות לכספים ולהתרחק', outcomes:[{p:1, text:'לא התפקיד שלך. גם ידעת את זה כל הזמן.', d:{sanity:2}}]},
+      { label:'לתת תמונה ורודה מדי כדי להרגיע', outcomes:[
+        {p:.4, text:'זה הרגיע אותו. זה גם לא היה מדויק לגמרי.', d:{sanity:-3}},
+        {p:.6, text:'הוא חזר עם עוד שאלות אחרי שגילה שזה לא בדיוק כך.', d:{rep:-5,sanity:-6}} ]},
+    ]},
+  { id:'data_breach', categories:['corporate'], title:'דליפת מידע', situation:'מסד נתוני הלקוחות דלף. אתה צריך להחליט תוך שעות איך ומתי לדווח.',
+    options:[
+      { label:'לדווח מיד ובשקיפות מלאה', outcomes:[
+        {p:.6, text:'המשקיעים כעסו, אבל הרגולטור העריך את המהירות.', d:{rep:8,sanity:-6}},
+        {p:.4, text:'הדיווח המהיר גרם לפאניקה גדולה מהנדרש.', d:{rep:-3,sanity:-8}} ]},
+      { label:'לחקור פנימית לפני שמדווחים', outcomes:[
+        {p:.5, text:'החקירה הראתה שזה קטן ממה שחששתם. דיווח מדויק יותר.', d:{rep:3,sanity:-4}},
+        {p:.5, text:'הרגולטור גילה שהמתנתם. זה נראה רע.', d:{rep:-10,sanity:-8}} ]},
+    ]},
+  { id:'competitor_lawsuit', categories:['corporate'], minLevel:1, title:'תביעת קניין רוחני', situation:'מתחרה גדול תובע את החברה על הפרת פטנט. הראיות מעורפלות.',
+    options:[
+      { label:'להילחם עד הסוף', outcomes:[
+        {p:.4, text:'ניצחתם! תקדים שמגן על החברה לשנים.', d:{rep:12,money:-30000,sanity:-10}},
+        {p:.6, text:'הפסדתם, אחרי הליך יקר וממושך.', d:{rep:-8,money:-80000,sanity:-15}} ]},
+      { label:'להגיע לפשרה מהירה', outcomes:[{p:1, text:'עולה כסף, נגמר מהר. אפשר לחזור לעבודה.', d:{money:-40000,sanity:3}}]},
+    ]},
+  { id:'remote_work_policy', categories:['corporate'], title:'מדיניות עבודה מהבית', situation:'ההנהלה מבקשת ממך לנסח מדיניות שתשמח גם את מי שרוצה לעבוד מהבית וגם את מי שדורש חזרה למשרד.',
+    options:[
+      { label:'לנסח מדיניות היברידית מפורטת', outcomes:[
+        {p:.6, text:'רוב האנשים מרוצים. לא כולם.', d:{rep:4,sanity:-3}},
+        {p:.4, text:'שני הצדדים מוצאים בה משהו להתלונן עליו.', d:{sanity:-6}} ]},
+      { label:'להשאיר את זה מעורפל בכוונה', outcomes:[{p:1, text:'גמישות שמונעת עימותים, אבל גם לא פותרת כלום.', d:{sanity:2}}]},
+    ]},
+  { id:'ai_liability', categories:['corporate'], title:'אחריות על תוצרי AI', situation:'המוצר החדש של החברה משתמש ב-AI שנותן המלצות ללקוחות. מישהו שואל: "מי אחראי כשהוא טועה?"',
+    options:[
+      { label:'לנסח disclaimer מקיף ולהגביל אחריות', outcomes:[
+        {p:.7, text:'המשפטנים בחברה מרוצים. גם המוצר קצת פחות אטרקטיבי.', d:{rep:5,sanity:-3}},
+        {p:.3, text:'לקוח בכל זאת תבע, וה-disclaimer לא הספיק.', d:{rep:-6,money:-20000}} ]},
+      { label:'לדחוף את צוות ההנדסה לשפר את דיוק המודל במקום', outcomes:[{p:1, text:'עבודה נוספת לצוות ההנדסה. פתרון אמיתי, לא רק משפטי.', d:{rep:6,sanity:-4}}]},
+    ]},
+  { id:'founder_conflict', categories:['corporate'], minLevel:1, title:'ריב מייסדים', situation:'שני מייסדי החברה לא מדברים אחד עם השני, ואתה נדרש/ת לתווך כי "אתה היחיד שאמון על שנינו".',
+    options:[
+      { label:'לתווך ישירות ביניהם', outcomes:[
+        {p:.5, text:'הצלחת להגיע להסכמה זמנית.', d:{rep:8,sanity:-6}},
+        {p:.5, text:'עכשיו שניהם כועסים עליך.', d:{rep:-4,sanity:-8}} ]},
+      { label:'להביא מגשר/ת חיצוני/ת מקצועי/ת', outcomes:[{p:1, text:'פתרון מקצועי. גם עלות נוספת לחברה.', d:{money:-15000,sanity:2}}]},
+    ]},
+  { id:'vc_negotiation', categories:['corporate'], minLevel:1, title:'משא ומתן עם קרן הון סיכון', situation:'הקרן המובילה בסבב הגיוס הבא דורשת תנאי preferred shares אגרסיביים. המנכ״ל רוצה שתחתום/י מהר.',
+    options:[
+      { label:'לדחוף בחזרה על התנאים', outcomes:[
+        {p:.5, text:'השגת תנאים הוגנים יותר. הקרן קצת פחות מחייכת אליך.', d:{rep:8,sanity:-5}},
+        {p:.5, text:'הקרן איימה לסגת מהעסקה. חזרתם לתנאים המקוריים בכל זאת.', d:{sanity:-8}} ]},
+      { label:'לחתום מהר כמו שביקשו', outcomes:[{p:1, text:'הגיוס נסגר מהר. התנאים יטרידו אתכם בעתיד.', d:{money:20000,sanity:3}}]},
+    ]},
+  { id:'acquihire_offer', categories:['corporate'], title:'הצעת רכישה', situation:'חברה גדולה יותר מציעה לרכוש את הצוות (לא בהכרח את המוצר). "אקוויהייר" קלאסי.',
+    options:[
+      { label:'לדחוף לעסקה', outcomes:[
+        {p:.6, text:'העסקה נסגרה. האופציות שלך הבשילו.', d:{money:80000,rep:5,sanity:-5}},
+        {p:.4, text:'המשא ומתן קרס ברגע האחרון.', d:{sanity:-10}} ]},
+      { label:'להתנגד, המוצר עוד לא מוכן לוותר עליו', outcomes:[{p:1, text:'המשכתם עצמאיים. גם קצת יותר מסוכן פיננסית.', d:{sanity:-3}}]},
+    ]},
+  { id:'perk_culture', categories:['corporate'], title:'תרבות הפינוקים', situation:'ההנהלה שוקלת להוסיף עוד מטבח שף, שולחן פינג פונג נוסף, וחדר נמנום. "זה בשביל שימור עובדים," אומרים.',
+    options:[
+      { label:'לתמוך, זה עוזר בגיוס', outcomes:[{p:1, text:'העובדים מרוצים. גם קצת ילדותי.', d:{sanity:3,money:-10000}}]},
+      { label:'להציע העלאת שכר במקום', outcomes:[
+        {p:.6, text:'זה עבד טוב יותר בפועל.', d:{rep:4,money:-15000}},
+        {p:.4, text:'ההנהלה חשבה שזה "פחות מגניב".', d:{network:-3}} ]},
+    ]},
+  { id:'whistle_engineer', categories:['corporate'], title:'מהנדס/ת מתריע/ה', situation:'מהנדס/ת בכיר/ה מגיע/ה אליך בסתר: "יש באג בטיחותי במוצר, וההנהלה יודעת ומתעלמת."',
+    options:[
+      { label:'להעלות את זה מיד להנהלה הבכירה', outcomes:[
+        {p:.6, text:'הבאג תוקן. גם קצת פגעת ביחסים עם כמה אנשים.', d:{rep:6,network:-4,sanity:-5}},
+        {p:.4, text:'ניסו לטשטש את הבעיה, ואת/ה נשאר/ת עם ידיעה לא נעימה.', d:{sanity:-10}} ]},
+      { label:'לבדוק בעצמך קודם אם זה אמיתי', outcomes:[{p:1, text:'זה היה אמיתי. עכשיו יש לך תיעוד מוצק.', d:{sanity:-4,rep:3}}]},
+    ]},
+  { id:'regulator_inquiry_corp', categories:['corporate'], minLevel:1, title:'בירור רגולטורי', situation:'רשות ניירות ערך פותחת בירור על גילויים בדוח הרבעוני האחרון.',
+    options:[
+      { label:'לשתף פעולה במלואו ובשקיפות', outcomes:[
+        {p:.7, text:'הבירור נסגר ללא ממצאים.', d:{rep:6,sanity:-6}},
+        {p:.3, text:'הרגולטור מצא אי-דיוק קטן. קנס סמלי.', d:{rep:-5,money:-10000}} ]},
+      { label:'להיעזר בעורכי דין חיצוניים ולנהל בזהירות', outcomes:[{p:1, text:'עלות גבוהה, אבל ניהול מקצועי של המשבר.', d:{money:-25000,sanity:2}}]},
     ]},
 
   // academic
@@ -813,15 +1030,15 @@ const DECISIONS = [
       { label:'להשתתף בהרצאות ולהתרכז בתוכן', outcomes:[{p:1, text:'למדת דברים שימושיים.', d:{rep:3,sanity:3}}]},
       { label:'לברוח לחוף הים בין המושבים', outcomes:[{p:1, text:'שלושה ימי חופש עם תג כנס.', d:{sanity:8}}]},
     ]},
-  { id:'hostage_pin_dilemma', categories:['judge'], minYear:2, title:'סיכה על הגלימה', situation:'עמיתים לשיפוט מתלבטים אם לענוד סיכת "מייצגים אליכם" על הגלימה. יש מי שרואה בזה סולידריות אנושית בסיסית, ויש מי שרואה בזה פגיעה במראית פני הניטרליות השיפוטית.',
+  { id:'hostage_pin_dilemma', categories:['firm','public'], minYear:2, title:'סיכה על הגלימה', situation:'עורכי דין מתלבטים אם לענוד סיכת "מייצגים אליכם" על הגלימה באולם. יש מי שרואה בזה סולידריות אנושית בסיסית, ויש מי שחושש שזה עלול להיתפס כלא מקצועי או כניסיון להשפיע על התהליך.',
     options:[
       { label:'לענוד את הסיכה', outcomes:[
-        {p:.5, text:'עמיתים תומכים בגישה שלך.', d:{network:5,publicRep:6,sanity:-3}},
-        {p:.5, text:'עורך דין בתיק מבקש את פסילתך בטענת חשש למשוא פנים.', d:{rep:-6,sanity:-8}} ]},
-      { label:'להימנע, ולשמור על ניטרליות מוחלטת בכל סמל חיצוני', outcomes:[{p:1, text:'שומר/ת על הקו המקצועי המחמיר. גם קצת מרגיש/ה קר.', d:{sanity:-3,rep:3}}]},
-      { label:'לענוד אותה רק מחוץ לאולם, לא על הגלימה עצמה', outcomes:[
-        {p:.6, text:'פתרון ביניים שרוב העמיתים מקבלים.', d:{network:3}},
-        {p:.4, text:'שני הצדדים חושבים שניסית לרצות את כולם, ונכשלת.', d:{sanity:-6}} ]},
+        {p:.5, text:'עמיתים ולקוחות מעריכים את הגילוי האישי.', d:{network:5,publicRep:6,sanity:-3}},
+        {p:.5, text:'השופט/ת מעיר/ה הערה על "הפגנת עמדה" באולם.', d:{rep:-4,sanity:-6}} ]},
+      { label:'להימנע לגמרי בבית המשפט, ולשמור את זה לחיים הפרטיים', outcomes:[{p:1, text:'שומר/ת על קו מקצועי נקי. גם קצת מרגיש/ה לא נאמן/ה לעצמך.', d:{sanity:-3}}]},
+      { label:'לענוד אותה רק מחוץ לאולם עצמו', outcomes:[
+        {p:.6, text:'פתרון ביניים שרוב האנשים מקבלים.', d:{network:3}},
+        {p:.4, text:'תחושה שניסית לרצות את כולם, ולא ממש הצלחת.', d:{sanity:-6}} ]},
     ]},
 
   // politics
@@ -914,6 +1131,15 @@ const FLAVOR_EVENTS = [
   { text:'השותפים מספרים שמשרד ש. הורוביץ ושות׳ נוסד ב-1921 בירושלים — המשרד הוותיק בישראל. יותר ותיק מהמדינה עצמה.', d:{network:1}, categories:['firm'] },
   { text:'פרופ׳ יוסף גרוס, מייסד משרד גרוס קליינהנדלר חודק, גם מלמד באוניברסיטת תל אביב וגם נחשב לאחד המומחים הבולטים בדיני חברות בישראל. אקדמיה ופרקטיקה, בלי לבחור.', d:{rep:1}, categories:['firm'] },
   { text:'מספרים שישראל גורניצקי, שייסד את המשרד ב-1938, שלט ב-13 שפות. את/ה עדיין מתלבט/ת אם לענות למייל באנגלית או בעברית.', d:{sanity:1}, categories:['firm'] },
+  { text:'השותף המנהל, מרדכי שמואלי, מזכיר לכולם, שוב, שהוא "קבע את הטון" במשרד עוד ב-1994.', d:{sanity:-1}, categories:['firm'] },
+  { text:'השותפה המנהלת, שונית טירלמן, פתחה "פינת רוגע" חדשה במשרד. אין בה שום רוגע.', d:{sanity:-1}, categories:['firm'] },
+  { text:'רונן דירט, שותף מנהל, מסביר בישיבת צוות למה "זה לגמרי בסדר מבחינה אתית", בלי לשכנע אף אחד.', d:{sanity:-1}, categories:['firm'] },
+  { text:'יצחק פינקלמן עדיין מסרב להשתמש בדוא"ל. הכל דרך הפקס. עדיין.', d:{sanity:1}, categories:['firm'] },
+  { text:'תומר גריי, שותף בכיר, מתהדר שהוא "לא לוקח ימי חופש כבר שבע שנים". אף אחד לא בטוח אם זו גאווה או קריאה לעזרה.', d:{sanity:-1}, categories:['firm'] },
+  { text:'מנואל קיגלמן שולח מייל לכל המשרד בשעה 23:58 עם הנושא "רק FYI", בלי שום מידע דחוף בפנים.', d:{sanity:-1}, categories:['firm'] },
+  { text:'רונית ברטל, שותפה בכירה, זוכרת את השם של כל מתמחה שעבד במשרד ב-15 השנים האחרונות. גם את זה שעזב אחרי שבוע.', d:{network:1}, categories:['firm'] },
+  { text:'ירון טיברמן חוגג עוד עסקה גדולה עם ארוחת צהריים למשרד כולו. אף אחד לא זוכר את הפעם האחרונה שזה קרה.', d:{sanity:2}, categories:['firm'] },
+  { text:'אסתי קריאף פרסמה עוד פוסט ארוך על "טוהר המקצוע". שלושה עורכי דין בקבוצת הוואטסאפ שלך שלחו אימוג׳י עיניים, אחד אחרי השני.', d:{sanity:1}, categories:['firm','public'] },
   { text:'עמית ותיק אומר שיש לך "משהו מאהרן ברק". את/ה יודע/ת שזה לא מדויק, אבל נחמד לשמוע בכל זאת.', d:{sanity:2}, categories:['judge'] },
   { text:'מזכירה קוראת לך "השמגר של הדור". את/ה לא לגמרי בטוח/ה אם זו מחמאה, אבל מקבל/ת אותה בברכה.', d:{sanity:2}, categories:['judge'] },
   { text:'פרשן משפטי כותב שיש לך "פוטנציאל אגרנטי". מתמחה צעיר/ה שואל/ת בשקט מי זה בכלל היה.', d:{rep:2}, categories:['judge'] },
@@ -947,6 +1173,7 @@ const ENDINGS = {
   burnt_out_escape: { title:'פרשת ופתחת בית קפה בגליל', badge:'תיק נסגר מרצון', desc:'יום אחד סגרת את התיק, ממש. עכשיו את/ה מקצף/ת חלב במקום לנסח כתבי טענות.' },
   quiet_failure: { title:'עוד עו״ד ברחוב אבן גבירול', badge:'בסדר גמור', desc:'לא הצלחה מסחררת, לא כישלון דרמטי. סתם תיקים, סתם קריירה. וזה גם בסדר.' },
   quiet_survivor: { title:'קריירה יציבה וארוכה', badge:'תיק נסגר בכבוד', desc:'בלי דרמות גדולות. תיקים באו והלכו, ואתה עדיין כאן אחרי שנות ותק לא מעטות.' },
+  tv_series_win: { title:'ניצחת במשחק', badge:'🏆 מיליון שקלים ותהילת עולם', desc:'עזבת הכל וכתבת עם החבר/ה הכי טוב/ה שלך מהלימודים את הסדרה המצליחה בהיסטוריה. מיליון שקלים, תהילת עולם, וכל מי שאי פעם הכיר אותך פתאום "תמיד ידע". כל הכבוד. ברצינות.' },
   fire_retirement: { title:'פרישה מוקדמת', badge:'בזמן, ובריא/ה', desc:'לא חיכית לגיל הפרישה, ולא חיכית שיישברי/ה קודם. יום אחד פשוט החלטת שמספיק זה מספיק, וסגרת את הדלת בעודך שפוי/ה לגמרי. לא כולם יוצאים ככה.' },
   legal_influencer: { title:'משפיע/ה משפטי/ת', badge:'500 אלף עוקבים', desc:'עמיתים ותיקים בקושי לוקחים אותך ברצינות מקצועית, אבל הסרטונים שלך על "3 טעויות שכל שוכר דירה עושה" עוברים מיליון צפיות. גם זה סוג של הצלחה.' },
   cancelled: { title:'מבוטל/ת ברשת', badge:'תיק תדמית סגור', desc:'משהו שאמרת, כתבת, או פשוט נראית עושה, יצא מהקשרו והפך לסוגיה ארצית. עדיין עורך/ת דין טוב/ה. עדיין ה-Google הראשון שלך זה זה.' },
@@ -961,6 +1188,10 @@ let state = null;
 let collection = { endings:[], gamesPlayed:0, fastestRun:null, lowSanitySurvivor:false };
 let screen = 'gender';
 let playerGender = null;
+let playerName = null;
+const NAMES_MALE = ['איתי','עומר','יונתן','אורי','דניאל','אלון','נועם','גיא','תומר','רועי','שי','ינון','אבנר','הורקנוס','זבולון','ששון'];
+const NAMES_FEMALE = ['נועה','שירה','מיכל','דנה','יעל','רותם','אביגיל','טליה','הדס','קרן','שולמית','אסתר','ורדית','תרצה','עדינה','שפרה'];
+function randomName(){ const pool = playerGender==='f' ? NAMES_FEMALE : NAMES_MALE; return pool[Math.floor(Math.random()*pool.length)]; }
 let chosenSchool = null;
 let selectedSchools = [];
 let chosenGoal = null;
@@ -982,7 +1213,8 @@ async function saveCollection(){ try{ await window.storage.set('legal_career_col
 function unlockEnding(id){ if(!collection.endings.includes(id)){ collection.endings.push(id); } }
 function recordGameEnd(){
   collection.gamesPlayed = (collection.gamesPlayed||0) + 1;
-  if(collection.fastestRun==null || state.year < collection.fastestRun) collection.fastestRun = state.year;
+  const yrs = seniorityYears(state.year);
+  if(collection.fastestRun==null || yrs < collection.fastestRun) collection.fastestRun = yrs;
   if(state.gotLowSanityAchievement) collection.lowSanitySurvivor = true;
   saveCollection();
 }
@@ -1000,12 +1232,12 @@ async function loadSavedProgress(){
 async function saveGameProgress(){
   if(!state || state.ended){ try{ await window.storage.delete('legal_career_inprogress', false); }catch(e){} return; }
   try{
-    const snapshot = { screen, playerGender, chosenSchool, selectedOrigins, originSelection, intervalSelection, hardModeSelection, state };
+    const snapshot = { screen, playerGender, playerName, chosenSchool, chosenGoal, selectedOrigins, originSelection, intervalSelection, hardModeSelection, state };
     await window.storage.set('legal_career_inprogress', JSON.stringify(snapshot), false);
   } catch(e){}
 }
 function resumeSavedProgress(){
-  screen = savedProgress.screen; playerGender = savedProgress.playerGender; chosenSchool = savedProgress.chosenSchool;
+  screen = savedProgress.screen; playerGender = savedProgress.playerGender; playerName = savedProgress.playerName; chosenSchool = savedProgress.chosenSchool; chosenGoal = savedProgress.chosenGoal;
   selectedOrigins = savedProgress.selectedOrigins||[]; originSelection = savedProgress.originSelection;
   intervalSelection = savedProgress.intervalSelection; hardModeSelection = savedProgress.hardModeSelection;
   state = savedProgress.state; savedProgress = null;
@@ -1087,6 +1319,8 @@ function netSalaryFor(workplace, level){
   return Math.round(gross*rate);
 }
 function roleTitle(){ return genderize(WORKPLACES[state.workplace].ladder[state.level], state.gender); }
+function seniorityLabel(year){ return year<=1 ? 'התמחות' : `שנת ותק ${year-2}`; }
+function seniorityYears(year){ return Math.max(0, year-2); }
 function placeLineText(){
   const wp = WORKPLACES[state.workplace];
   return wp.name + (state.department ? ` · מחלקת ${DEPARTMENTS.find(d=>d.id===state.department).name}` : '');
@@ -1116,6 +1350,11 @@ function drawDecision(){
   const elig = DECISIONS.filter(d=>checkEligible(d,state));
   let pool = elig.filter(d=>!state.recentDecisionIds.includes(d.id));
   if(pool.length===0) pool = elig;
+  if(pool.length===0){
+    // safety net: should not happen (life_event/dating_time have no restrictions), but never crash
+    return { id:'quiet_moment', title:'רגע שקט', situation:'יום רגיל בעבודה, בלי דרמות מיוחדות.',
+      options:[{ label:'להמשיך הלאה', outcomes:[{p:1, text:'עוד יום עבר.', d:{sanity:1}}] }] };
+  }
   const boosted = (state.eliteSchool||state.hadSupremeClerkship);
   const weightFn = (d)=>{
     let w = 1;
@@ -1140,12 +1379,13 @@ function jobSearchEvent(){
     id:'jobsearch', title:'לאן פונים?', situation:'השוק המשפטי מחכה. הגיע הזמן לשלוח קורות חיים.',
     options:[
       { label:'להגיש מועמדות למשרד פרטי', outcomes:[
-        {p:.4, text:'התקבלת למשרד ענק. ברוך/ה הבא/ה למרתון.', d:{}, moveTo:{workplace:'mega_firm',level:1}},
-        {p:.35, text:'התקבלת למשרד גדול, בתנאים סבירים.', d:{}, moveTo:{workplace:'large_firm',level:1}},
-        {p:.25, text:'משרד קטן קלט אותך בחום.', d:{}, moveTo:{workplace:'small_firm',level:1}} ]},
+        {p:.4, text:'"מותר הכל ושות׳" קלטו אותך. ברוך/ה הבא/ה למרתון.', d:{}, moveTo:{workplace:'mega_firm',level:1}},
+        {p:.35, text:'"הרצוג שועל נאמן" קלטו אותך, בתנאים סבירים.', d:{}, moveTo:{workplace:'large_firm',level:1}},
+        {p:.25, text:'"קטנצקי ושות׳" קלטו אותך בחום.', d:{}, moveTo:{workplace:'small_firm',level:1}} ]},
       { label:'לפנות לעמותה או לגוף ציבורי', outcomes:[
-        {p:.5, text:'התקבלת ליחידה הציבורית. המצפון שלך שמח.', d:{}, moveTo:{workplace:'bagatz',level:1}},
-        {p:.5, text:'עמותה קטנה שמחה לצרף אותך.', d:{}, moveTo:{workplace:'ngo',level:1}} ]},
+        {p:.4, text:'התקבלת ליחידה הציבורית. המצפון שלך שמח.', d:{}, moveTo:{workplace:'bagatz',level:1}},
+        {p:.3, text:'עמותת "זכות ולא חסד" שמחה לצרף אותך.', d:{}, moveTo:{workplace:'ngo',level:1}},
+        {p:.3, text:'יחידת סמך רגולטורית קלטה אותך. מזל טוב, עכשיו יש לך תעודת עובד מדינה.', d:{}, moveTo:{workplace:'regulatory',level:1}} ]},
       { label:'מה שיש — גם ביטוח לאומי זו עבודה', outcomes:[
         {p:1, text:'לפחות יש ביטחון תעסוקתי. הרבה ביטחון תעסוקתי.', d:{sanity:3}, moveTo:{workplace:'bituach_leumi',level:1}} ]},
     ]
@@ -1159,18 +1399,19 @@ function clerkshipEndEvent(){
       ? 'שנתיים של קלרקות בעליון הסתיימו. השוק המשפטי כבר יודע מי אתה, ורוצה אותך.'
       : 'שנתיים של קלרקות במחוזי/שלום הסתיימו. יש לך ניסיון אמיתי, ואולי גם קצת ציניות.',
     options: supreme ? [
-      { label:'משרד ענק רוצה אותך על הסף', outcomes:[
+      { label:'"מותר הכל ושות׳" רוצים אותך על הסף', outcomes:[
         {p:.7, text:'קיבלת הצעה שאי אפשר לסרב לה.', d:{rep:5}, moveTo:{workplace:'mega_firm',level:1}},
-        {p:.3, text:'קיבלת הצעה טובה, קצת פחות מסחררת.', d:{rep:2}, moveTo:{workplace:'large_firm',level:1}} ]},
+        {p:.3, text:'"הרצוג שועל נאמן" הציעו הצעה טובה, קצת פחות מסחררת.', d:{rep:2}, moveTo:{workplace:'large_firm',level:1}} ]},
       { label:'להצטרף ליחידה הציבורית הבכירה', outcomes:[{p:1, text:'ניסיון בעליון פותח דלתות בעולם הציבורי.', d:{rep:3}, moveTo:{workplace:'bagatz',level:1}}]},
       { label:'לנסות מסלול אקדמי', outcomes:[{p:1, text:'התואר "פעם קלרק/ית בעליון" עושה רושם על הסטודנטים.', d:{rep:4}, moveTo:{workplace:'academic',level:0}}]},
     ] : [
       { label:'משרד פרטי — גדול או קטן', outcomes:[
-        {p:.5, text:'משרד גדול שמח לקלוט מישהו עם ניסיון אולם אמיתי.', d:{}, moveTo:{workplace:'large_firm',level:1}},
-        {p:.5, text:'משרד קטן, אבל עם תיקים אמיתיים מהיום הראשון.', d:{}, moveTo:{workplace:'small_firm',level:1}} ]},
-      { label:'עמותה או גוף ציבורי', outcomes:[
-        {p:.5, text:'המצפון שלך שמח, הארנק פחות.', d:{}, moveTo:{workplace:'bagatz',level:1}},
-        {p:.5, text:'עמותה קטנה שמחה לצרף מישהו עם ניסיון בית משפט.', d:{}, moveTo:{workplace:'ngo',level:1}} ]},
+        {p:.5, text:'"הרצוג שועל נאמן" שמחים לקלוט מישהו עם ניסיון אולם אמיתי.', d:{}, moveTo:{workplace:'large_firm',level:1}},
+        {p:.5, text:'"קטנצקי ושות׳", אבל עם תיקים אמיתיים מהיום הראשון.', d:{}, moveTo:{workplace:'small_firm',level:1}} ]},
+      { label:'עמותה, גוף ציבורי, או רגולציה', outcomes:[
+        {p:.4, text:'המצפון שלך שמח, הארנק פחות.', d:{}, moveTo:{workplace:'bagatz',level:1}},
+        {p:.3, text:'עמותת "זכות ולא חסד" שמחה לצרף מישהו עם ניסיון בית משפט.', d:{}, moveTo:{workplace:'ngo',level:1}},
+        {p:.3, text:'יחידת סמך רגולטורית מגייסת מישהו עם רקע משפטי חזק.', d:{}, moveTo:{workplace:'regulatory',level:1}} ]},
       { label:'ביטוח לאומי תמיד מגייסים', outcomes:[{p:1, text:'ביטחון תעסוקתי מנצח כל דרמה. או שלא.', d:{sanity:2}, moveTo:{workplace:'bituach_leumi',level:1}}]},
     ]
   };
@@ -1216,6 +1457,18 @@ function internDilemmaEvent(){
       { label:'לנסות לאזן בין השניים, כרגיל', outcomes:[{p:1, text:'לא מושלם, אבל שרדת את שניהם.', d:{sanity:-3}}], studyBias:0 },
     ] };
 }
+function internDilemma2Event(){
+  return { id:'intern_dilemma2', title:'טעות בהתמחות', situation:'גילית טעות קטנה במסמך שכבר הוגש לבית המשפט. אף אחד עוד לא שם לב.',
+    options:[
+      { label:'לדווח מיד לעו״ד האחראי', outcomes:[{p:1, text:'העו״ד העריך את היושר, ותיקנתם בזמן.', d:{rep:3,sanity:-3}}] },
+      { label:'לתקן בשקט בהגשה הבאה, בלי להזכיר', outcomes:[
+        {p:.6, text:'אף אחד לא שם לב. נשמת לרווחה.', d:{sanity:-2}},
+        {p:.4, text:'השופט/ת שם/ה לב. זה היה רגע לא נעים.', d:{rep:-5,sanity:-8}} ]},
+      { label:'להתעלם, זו טעות זניחה', outcomes:[
+        {p:.5, text:'זה באמת לא היה משמעותי.', d:{sanity:2}},
+        {p:.5, text:'זה כן היה משמעותי. למדת לקח.', d:{rep:-3,sanity:-5}} ]},
+    ] };
+}
 function barQ1Event(){
   return { id:'bar_q1', title:'הכנה למבחני הלשכה', situation:'איך ניגשת להכנה למבחני ההסמכה?',
     options:[
@@ -1235,7 +1488,25 @@ function barQ2Event(){
 
 /* ---------- flow ---------- */
 
+const MONEY_MILESTONES = [
+  { threshold:150000, flag:'ms_car', text:'💰 צברת מספיק להורדה ראשונה על רכב סביר. לא יוקרתי. סביר.' },
+  { threshold:500000, flag:'ms_apt', text:'💰 יש לך הון עצמי לדירה קטנה — איפשהו רחוק מהמרכז, אבל זו התחלה.' },
+  { threshold:1000000, flag:'ms_million', text:'💰 עברת את המיליון הראשון. אמא כבר מספרת לשכנות.' },
+  { threshold:2500000, flag:'ms_mortgage', text:'💰 המשכנתא כבר לא מפחידה אותך כמו שהיא הפחידה בהתחלה.' },
+  { threshold:5000000, flag:'ms_fire', text:'💰 חמישה מיליון בצד. פרישה מוקדמת כבר לא נשמעת כמו פנטזיה.' },
+  { threshold:-50000, flag:'ms_debt1', text:'💸 חברת האשראי מתחילה להתקשר אליך, לא רק אתה אליה.' },
+  { threshold:-150000, flag:'ms_debt2', text:'💸 את/ה נמנע/ת מלבדוק את חשבון הבנק בבוקר. זה לא נעלם ככה.' },
+];
+function checkMoneyMilestones(){
+  for(const m of MONEY_MILESTONES){
+    if(state.flags[m.flag]) continue;
+    if(m.threshold>0 && state.money>=m.threshold){ state.flags[m.flag]=true; state.log.unshift({year:state.year, text:m.text, cls:'good', score:3}); }
+    if(m.threshold<0 && state.money<=m.threshold){ state.flags[m.flag]=true; state.log.unshift({year:state.year, text:m.text, cls:'bad', score:-3}); }
+  }
+}
+
 function finishTurn(){
+  checkMoneyMilestones();
   state.history.push({year:state.year, rep:state.rep, money:state.money, sanity:state.sanity, network:state.network, publicRep:state.publicRep});
   const forced = checkForcedEnd();
   if(forced){ endGame(forced); return; }
@@ -1292,7 +1563,7 @@ function newState(originId, interval, hardMode){
     ended:false, endingId:null, pendingEvent:null, pendingKind:null,
     school: chosenSchool.id, eliteSchool: chosenSchool.tier>=3, goal: chosenGoal,
     hadSupremeClerkship: originId==='court_supreme',
-    gender: playerGender, lastMoveYear:1, barInvest:0, barEnjoy:0, barBias:0,
+    gender: playerGender, name: playerName, lastMoveYear:1, barInvest:0, barEnjoy:0, barBias:0, pendingDecisionsCount:0,
     history: [],
   };
   st.money += netSalaryFor(st.workplace, st.level) * 12;
@@ -1323,8 +1594,11 @@ function advanceYear(){
     state.pendingEvent = clerkshipEndEvent(); state.pendingKind = 'normal';
     render(); return;
   }
-  const isDecisionYear = (state.year - 2) >= 0 && (state.year - 2) % state.interval === 0;
-  if(isDecisionYear){
+  let decisionsThisTurn = 0;
+  if(state.interval === 0){ decisionsThisTurn = 3; }
+  else if((state.year - 2) >= 0 && (state.year - 2) % state.interval === 0){ decisionsThisTurn = 1; }
+  if(decisionsThisTurn > 0){
+    state.pendingDecisionsCount = decisionsThisTurn;
     if(WORKPLACES[state.workplace].hasDept && !state.department && state.year>=3 && Math.random()<0.4){
       state.pendingEvent = departmentEvent(); state.pendingKind = 'department';
       render(); return;
@@ -1374,6 +1648,14 @@ function computeChoice(optIndex, boostOn){
     const score = sumDelta(outcome.d);
     state.log.unshift({year:1, text:`${ev.title}: ${opt.label} — ${outcome.text}`, cls: score>=0?'good':'bad', deltaStr: deltaText(outcome.d), score});
     state.barBias = opt.studyBias||0;
+    return { text:outcome.text, cls: score>=0?'good':'bad', deltaStr: deltaText(outcome.d), next:'chain-intern_dilemma2' };
+  }
+  if(kind==='intern_dilemma2'){
+    const opt = ev.options[optIndex];
+    const outcome = pickOutcome(opt.outcomes);
+    applyDelta(outcome.d);
+    const score = sumDelta(outcome.d);
+    state.log.unshift({year:1, text:`${ev.title}: ${opt.label} — ${outcome.text}`, cls: score>=0?'good':'bad', deltaStr: deltaText(outcome.d), score});
     return { text:outcome.text, cls: score>=0?'good':'bad', deltaStr: deltaText(outcome.d), next:'chain-bar_q1' };
   }
   if(kind==='bar_q2'){
@@ -1435,7 +1717,22 @@ function computeChoice(optIndex, boostOn){
 
 function proceedAfterChoice(next){
   state.pendingEvent = null;
-  if(next==='finish'){ finishTurn(); return; }
+  if(next==='finish'){
+    const forced = checkForcedEnd();
+    if(forced){ state.pendingDecisionsCount = 0; endGame(forced); return; }
+    if(state.pendingDecisionsCount && state.pendingDecisionsCount > 1){
+      state.pendingDecisionsCount--;
+      if(WORKPLACES[state.workplace].hasDept && !state.department && state.year>=3 && Math.random()<0.4){
+        state.pendingEvent = departmentEvent(); state.pendingKind = 'department';
+      } else {
+        state.pendingEvent = drawDecision(); state.pendingKind = 'normal';
+      }
+      render(); return;
+    }
+    state.pendingDecisionsCount = 0;
+    finishTurn(); return;
+  }
+  if(next==='chain-intern_dilemma2'){ state.pendingEvent = internDilemma2Event(); state.pendingKind = 'intern_dilemma2'; render(); return; }
   if(next==='chain-bar_q1'){ state.pendingEvent = barQ1Event(); state.pendingKind = 'bar_q1'; render(); return; }
   if(next && next.startsWith('end:')){ endGame(next.slice(4)); return; }
   finishTurn();
@@ -1453,8 +1750,17 @@ function bdiTier(rep){
   if(rep>=20) return {label:'דירוג בסיסי', sub:'יש עוד עבודה', emoji:'📋'};
   return {label:'לא מדורג/ת', sub:'אולי בשנה הבאה', emoji:'❓'};
 }
-function bdiInlineHTML(rep, rankParts){
+function wealthTier(money){
+  if(money>=5000000) return {label:'רמת חיים מפוארת', emoji:'💎'};
+  if(money>=2000000) return {label:'רמת חיים נוחה מאוד', emoji:'🏡'};
+  if(money>=800000) return {label:'רמת חיים נוחה', emoji:'🙂'};
+  if(money>=0) return {label:'רמת חיים יציבה', emoji:'😐'};
+  if(money>=-50000) return {label:'רמת חיים מהודקת', emoji:'😬'};
+  return {label:'רמת חיים לחוצה', emoji:'😰'};
+}
+function bdiInlineHTML(rep, rankParts, money){
   const t = bdiTier(rep);
+  const w = wealthTier(money);
   const rankLine = rankParts && rankParts.length ? ` · ${rankParts.join(' · ')}` : '';
   return `<div class="bdi-inline">
     <div class="bdi-row">
@@ -1462,8 +1768,28 @@ function bdiInlineHTML(rep, rankParts){
       <button class="link-btn" id="bdi-info-btn">מה זה אומר? ℹ️</button>
     </div>
     <div class="bdi-sub">${t.sub}${rankLine}</div>
+    <div class="bdi-row" style="margin-top:8px;"><span class="bdi-tier-inline" style="color:var(--good); font-size:13px;">${w.emoji} ${w.label}</span></div>
   </div>`;
 }
+function showHelpModal(){
+  const backdrop = document.createElement('div');
+  backdrop.className = 'modal-backdrop';
+  backdrop.innerHTML = `<div class="modal">
+    <div class="badge">איך משחקים</div>
+    <h3>המדריך המהיר</h3>
+    <p class="situation">🎲 <b>החלטות</b> — לכל אופציה יש כמה תוצאות אפשריות, מסומנות בתגיות צבע: ירוק = הכי טוב, צהוב = אמצע, אדום = הכי גרוע. אחרי שבוחרים, מטילים קוביה ורואים מה יצא.</p>
+    <p class="situation">🤝 <b>קשרים</b> — מ-15 נקודות קשרים ומעלה אפשר "להפעיל קשרים" לפני שבוחרים, כדי להטות את הסיכויים לתוצאה הטובה יותר.</p>
+    <p class="situation">📊 <b>מוניטין מקצועי</b> — מדורג בסגנון BDI (יהלום/פלטינום/זהב/ארד). הוא פותח הזדמנויות — שיפוט, נשיאות הלשכה, ועוד. לחצן ה-ℹ️ ליד הדירוג מסביר את כל הסיפים.</p>
+    <p class="situation">💰 <b>רמת חיים</b> — ההון לא מוצג כמספר, אלא כתיאור מצב (מיציבה ועד מפוארת). זה מושפע מכל החלטה כלכלית לאורך הקריירה.</p>
+    <p class="situation">🎓 <b>שנות ותק</b> — ההתמחות (שנה 1) לא נספרת כשנת ותק. שנות הוותק מתחילות רק אחרי שעוברים את מבחני הלשכה — והשנה הראשונה נקראת "שנת ותק 0".</p>
+    <p class="situation">💾 <b>שמירה</b> — ההתקדמות נשמרת אוטומטית. אפשר לצאת ולחזור באמצע קריירה.</p>
+    <p class="situation">🏆 <b>האוסף</b> — כל סיום קריירה נשמר באוסף שלך, נגיש מהמסכים הראשונים.</p>
+    <button class="btn" id="help-close">הבנתי, בואו נתחיל</button>
+  </div>`;
+  document.body.appendChild(backdrop);
+  document.getElementById('help-close').onclick = ()=>document.body.removeChild(backdrop);
+}
+
 function showBdiInfoModal(){
   const backdrop = document.createElement('div');
   backdrop.className = 'modal-backdrop';
@@ -1506,6 +1832,7 @@ function statChip(label, value, isMoney, isBar){
 function render(){
   if(screen==='resume') return renderResume();
   if(screen==='gender') return renderGender();
+  if(screen==='name') return renderName();
   if(screen==='school') return renderSchool();
   if(screen==='goal') return renderGoal();
   if(screen==='start') return renderStart();
@@ -1519,7 +1846,7 @@ function renderResume(){
   app.innerHTML = `
     <div class="card">
       <h2 class="card-title">יש לך קריירה בתהליך</h2>
-      <p class="card-sub">שנת ותק ${s.year} · ${genderize(wp.ladder[s.level], s.gender)} · ${wp.name}. להמשיך משם, או להתחיל קריירה חדשה?</p>
+      <p class="card-sub">${seniorityLabel(s.year)} · ${genderize(wp.ladder[s.level], s.gender)} · ${wp.name}. להמשיך משם, או להתחיל קריירה חדשה?</p>
       <div class="btn-row">
         <button class="btn" id="resume-btn">להמשיך מאיפה שעצרת</button>
         <button class="btn secondary" id="discard-btn">קריירה חדשה</button>
@@ -1540,12 +1867,34 @@ function renderGender(){
         <div class="gender-card ${playerGender==='m'?'selected':''}" data-g="m">גבר</div>
       </div>
       <button class="btn" id="gender-next" ${!playerGender?'disabled':''}>הבא</button>
+      <div class="disclaimer-full">"כמה עו״ד" הוא משחק בדיוני שנועד לבידור בלבד. כל הדמויות, השמות, הארגונים, מקומות העבודה והתרחישים המופיעים בו בדויים או נבחרים באקראי, וכל דמיון למציאות מקרי בהחלט. תוצאות הבחירות נקבעות באמצעות מנגנון הסתברותי אקראי ומושפעות מנתוני הדמות; הן אינן מעידות שהבחירה שנעשתה נכונה, מומלצת או עדיפה מבחינה משפטית, מקצועית או אחרת. אין במשחק, בתרחישים, באפשרויות הבחירה או בתוצאותיהם משום ייעוץ משפטי, תחליף לייעוץ משפטי או המלצה לפעולה במקרה ממשי.</div>
     </div>
   `;
   document.querySelectorAll('.gender-card').forEach(el=>{
     el.onclick = ()=>{ playerGender = el.dataset.g; render(); };
   });
-  document.getElementById('gender-next').onclick = ()=>{ if(playerGender){ screen='school'; render(); } };
+  document.getElementById('gender-next').onclick = ()=>{ if(playerGender){ screen='name'; render(); } };
+}
+
+function renderName(){
+  app.innerHTML = `
+    <div class="card">
+      <h2 class="card-title">איך קוראים לך?</h2>
+      <p class="card-sub">אפשר להקליד שם, או לתת לגורל לבחור בשבילך.</p>
+      <input type="text" id="name-input" placeholder="השם שלך" value="${playerName||''}" style="width:100%; box-sizing:border-box; padding:13px 14px; border-radius:12px; border:1.5px solid var(--border); background:var(--card-2); color:var(--text); font-family:var(--font-body); font-size:14px; margin-bottom:10px;" />
+      <button class="btn secondary" id="dice-name-btn" style="margin-bottom:14px;">🎲 תן לגורל לבחור שם</button>
+      <button class="btn" id="name-next">הבא</button>
+    </div>
+  `;
+  document.getElementById('dice-name-btn').onclick = ()=>{
+    playerName = randomName();
+    document.getElementById('name-input').value = playerName;
+  };
+  document.getElementById('name-next').onclick = ()=>{
+    const val = document.getElementById('name-input').value.trim();
+    playerName = val || randomName();
+    screen='school'; render();
+  };
 }
 
 function renderSchool(){
@@ -1629,15 +1978,16 @@ function renderStart(){
             </div>
           </div>`).join('')}
       </div>
-      <h2 class="card-title" style="font-size:14px;">כל כמה שנות ותק מתקבלת החלטה?</h2>
-      <div class="pill-row" id="interval-options">
-        <div class="pill ${intervalSelection===1?'selected':''}" data-v="1">כל שנה</div>
-        <div class="pill ${intervalSelection===2?'selected':''}" data-v="2">כל 2 שנים</div>
-        <div class="pill ${intervalSelection===3?'selected':''}" data-v="3">כל 3 שנים</div>
+      <h2 class="card-title" style="font-size:14px;">כל כמה זמן מתקבלת החלטה?</h2>
+      <div class="pill-row" id="interval-options" style="flex-wrap:wrap;">
+        <div class="pill" style="flex:1 1 45%;" data-v="3">כל 3 שנים — רגוע/ה</div>
+        <div class="pill" style="flex:1 1 45%;" data-v="2">כל 2 שנים — מאוזן/ת</div>
+        <div class="pill" style="flex:1 1 45%;" data-v="1">כל שנה — מעורב/ת</div>
+        <div class="pill" style="flex:1 1 100%;" data-v="0">⚡ 3 בשנה — "אני תותח, אני משקיע אגרסיבי, אני לא מפחד/ת מכלום"</div>
       </div>
       <div class="pill-row" id="hard-options">
         <div class="pill ${!hardModeSelection?'selected':''}" data-v="0">מצב רגיל</div>
-        <div class="pill ${hardModeSelection?'selected':''}" data-v="1">מצב קשה 🔥 (שפיות פתיחה נמוכה, בלאי קשרים כפול, סף פשיטת רגל וסף השעיה מחמירים)</div>
+        <div class="pill ${hardModeSelection?'selected':''}" data-v="1">מצב קשה 🔥 (שפיות פתיחה נמוכה, בלאי קשרים כפול, סף השעיה מחמיר)</div>
       </div>
       <button class="btn" id="start-btn" ${!originSelection?'disabled':''}>התחל/י קריירה</button>
     </div>
@@ -1646,6 +1996,7 @@ function renderStart(){
     el.onclick = ()=>{ originSelection = el.dataset.id; render(); };
   });
   document.querySelectorAll('#interval-options .pill').forEach(el=>{
+    if(parseInt(el.dataset.v)===intervalSelection) el.classList.add('selected');
     el.onclick = ()=>{ intervalSelection = parseInt(el.dataset.v); render(); };
   });
   document.querySelectorAll('#hard-options .pill').forEach(el=>{
@@ -1672,7 +2023,7 @@ function renderGame(){
 
   const logHTML = state.log.slice(0,8).map(l=>`
     <div class="log-entry ${l.cls}">
-      <span class="lg-year">שנת ותק ${l.year}</span>
+      <span class="lg-year">${seniorityLabel(l.year)}</span>
       ${l.text}
       ${l.deltaStr ? `<div class="lg-delta">${l.deltaStr}</div>`:''}
     </div>`).join('');
@@ -1681,10 +2032,11 @@ function renderGame(){
     <div class="player-card">
       <div class="player-top">
         <div>
+          <div class="player-name">${state.name}</div>
           <div class="player-role">${roleTitle()}</div>
           <div class="player-place">${placeLine}</div>
         </div>
-        <div class="year-badge">שנת ותק ${state.year}</div>
+        <div class="year-badge">${seniorityLabel(state.year)}</div>
       </div>
       <div class="level-dots">${dots}</div>
     </div>
@@ -1694,12 +2046,12 @@ function renderGame(){
         ${statChip('קשרים', state.network, false, true)}
         ${statChip('תדמית ציבורית', state.publicRep, false, true)}
       </div>
-      ${bdiInlineHTML(state.rep, rankParts)}
+      ${bdiInlineHTML(state.rep, rankParts, state.money)}
     </div>
     <div class="card">
       <h2 class="card-title" style="font-size:14px;">יומן קריירה</h2>
       <div class="log">${logHTML}</div>
-      <button class="btn" id="next-year">שנת ותק הבאה ←</button>
+      <button class="btn" id="next-year">השנה הבאה ←</button>
       ${state.year>=MIN_RETIRE_YEAR ? `<div style="margin-top:9px;"><button class="btn secondary" id="retire-btn">לפרוש עכשיו</button></div>` : ''}
     </div>
   `;
@@ -1718,7 +2070,7 @@ function renderGame(){
 function renderNarrativeModal(ev){
   const backdrop = document.createElement('div');
   backdrop.className = 'modal-backdrop';
-  backdrop.innerHTML = `<div class="modal"><div class="badge">שנת ותק ${state.year}</div><h3>${ev.title}</h3><p class="situation">${ev.situation}</p><button class="btn" id="ack-btn">להמשיך</button></div>`;
+  backdrop.innerHTML = `<div class="modal"><div class="badge">${seniorityLabel(state.year)}</div><h3>${ev.title}</h3><p class="situation">${ev.situation}</p><button class="btn" id="ack-btn">להמשיך</button></div>`;
   document.body.appendChild(backdrop);
   document.getElementById('ack-btn').onclick = ()=>{ document.body.removeChild(backdrop); resolveNarrativeOnly(); };
 }
@@ -1744,9 +2096,9 @@ function impactTag(ev){
 function renderChoiceModal(ev, kind){
   const backdrop = document.createElement('div');
   backdrop.className = 'modal-backdrop';
-  const badgeMap = { department:'בחירת מחלקה', offer:'הצעת המשך', intern_dilemma:'שנה 1: התמחות', bar_q1:'הכנה ללשכה', bar_q2:'הכנה ללשכה' };
-  const badgeText = badgeMap[kind] || `החלטה — שנת ותק ${state.year}`;
-  const showOdds = kind==='normal' || kind==='offer';
+  const badgeMap = { department:'בחירת מחלקה', offer:'הצעת המשך', intern_dilemma:'שנה 1: התמחות', intern_dilemma2:'שנה 1: התמחות', bar_q1:'הכנה ללשכה', bar_q2:'הכנה ללשכה' };
+  const badgeText = badgeMap[kind] || `החלטה — ${seniorityLabel(state.year)}`;
+  const showOdds = kind==='normal' || kind==='offer' || kind==='intern_dilemma2';
   const canBoost = kind==='normal' && state.network>=15 && ev.options.some(o=>o.outcomes && o.outcomes.length>1);
   const tag = kind==='normal' ? impactTag(ev) : '';
   let boostOn = false;
@@ -1807,8 +2159,8 @@ function renderChoiceModal(ev, kind){
 
 function buildShareText(){
   const e = ENDINGS[state.endingId];
-  const school = LAW_SCHOOLS.find(s=>s.id===state.school).name;
-  return `כמה עו״ד — סיכום קריירה\n${school} ← ${roleTitle()} ב${WORKPLACES[state.workplace].name}\n${state.year} שנות ותק · מוניטין מקצועי ${state.rep}\nסיום: ${genderize(e.title,state.gender)} (${e.badge})`;
+  const school = (LAW_SCHOOLS.find(s=>s.id===state.school)||{}).name || 'מוסד לימוד לא ידוע';
+  return `כמה עו״ד — סיכום הקריירה של ${state.name}\n${school} ← ${roleTitle()} ב${WORKPLACES[state.workplace].name}\n${seniorityYears(state.year)} שנות ותק · מוניטין מקצועי ${state.rep}\nסיום: ${genderize(e.title,state.gender)} (${e.badge})`;
 }
 
 function goalReflection(){
@@ -1819,7 +2171,7 @@ function goalReflection(){
     || (state.goal==='academic' && wp==='academic')
     || (state.goal==='judge' && wp==='judge')
     || (state.goal==='independent' && wp==='independent');
-  const goalName = GOALS.find(g=>g.id===state.goal).name;
+  const goalName = (GOALS.find(g=>g.id===state.goal)||{}).name || 'מטרה לא ידועה';
   return hit
     ? `<div class="rank-line" style="margin-top:14px;">🎯 ביום הראשון אמרת "${goalName}". הגעת בדיוק לשם. לא לכולם יש את זה.</div>`
     : `<div class="rank-line" style="margin-top:14px;">🎯 ביום הראשון אמרת "${goalName}". הקריירה הלכה למקום אחר לגמרי — וזה קורה כמעט לכולם.</div>`;
@@ -1836,8 +2188,8 @@ function renderEnd(){
     <div class="card">
       <h2 class="card-title" style="font-size:14px;">רגעי מפתח</h2>
       <div class="log">
-        ${best.map(l=>`<div class="log-entry good"><span class="lg-year">שנת ותק ${l.year} · שיא</span>${l.text}</div>`).join('')}
-        ${worst.map(l=>`<div class="log-entry bad"><span class="lg-year">שנת ותק ${l.year} · שפל</span>${l.text}</div>`).join('')}
+        ${best.map(l=>`<div class="log-entry good"><span class="lg-year">${seniorityLabel(l.year)} · שיא</span>${l.text}</div>`).join('')}
+        ${worst.map(l=>`<div class="log-entry bad"><span class="lg-year">${seniorityLabel(l.year)} · שפל</span>${l.text}</div>`).join('')}
       </div>
     </div>` : '';
 
@@ -1855,7 +2207,7 @@ function renderEnd(){
       <div class="log">
         ${whatIfCandidates.map((l,idx)=>`
           <div class="log-entry">
-            <span class="lg-year">שנת ותק ${l.year}</span>
+            <span class="lg-year">${seniorityLabel(l.year)}</span>
             ${l.eventTitle}: ${l.optLabel}
             <div class="lg-delta" style="margin-top:4px;">בפועל: ${l.text}</div>
             <button class="link-btn whatif-btn" data-idx="${idx}" style="margin-top:6px;">🎲 להטיל שוב</button>
@@ -1870,7 +2222,7 @@ function renderEnd(){
       <div class="timeline">
         ${state.careerPath.map(st=>`
           <div class="timeline-item">
-            <div class="ty">שנת ${st.year}</div>
+            <div class="ty">${seniorityLabel(st.year)}</div>
             <div class="tr">${st.role}</div>
             <div class="tp">${st.place}</div>
           </div>`).join('')}
@@ -1886,10 +2238,10 @@ function renderEnd(){
       <div class="stat-grid" style="margin-bottom:4px;">
         ${statChip('שפיות', state.sanity, false, false)}
         ${statChip('קשרים', state.network, false, false)}
-        ${statChip('שנות ותק', state.year, false, false)}
+        ${statChip('שנות ותק', seniorityYears(state.year), false, false)}
         ${statChip('תדמית ציבורית', state.publicRep, false, false)}
       </div>
-      ${bdiInlineHTML(state.rep, [])}
+      ${bdiInlineHTML(state.rep, [], state.money)}
       <div class="btn-row" style="margin-top:18px;">
         <button class="btn" id="play-again">קריירה חדשה</button>
         <button class="btn secondary" id="to-collection">🏆 לאוסף שלי</button>
@@ -1901,7 +2253,7 @@ function renderEnd(){
     ${whatIfHTML}
     ${pathHTML}
   `;
-  document.getElementById('play-again').onclick = ()=>{ screen='gender'; playerGender=null; chosenSchool=null; selectedSchools=[]; chosenGoal=null; originSelection=null; selectedOrigins=[]; hardModeSelection=false; state=null; render(); };
+  document.getElementById('play-again').onclick = ()=>{ screen='gender'; playerGender=null; playerName=null; chosenSchool=null; selectedSchools=[]; chosenGoal=null; originSelection=null; selectedOrigins=[]; hardModeSelection=false; state=null; render(); };
   document.getElementById('to-collection').onclick = ()=>{ screen='collection'; render(); };
   const bdiBtn = document.getElementById('bdi-info-btn');
   if(bdiBtn) bdiBtn.onclick = showBdiInfoModal;
@@ -1952,6 +2304,7 @@ function renderCollection(){
 
 (async function init(){
   app.innerHTML = `<div class="card"><p class="card-sub">טוען...</p></div>`;
+  document.getElementById('help-btn').onclick = showHelpModal;
   await loadCollection();
   await loadSavedProgress();
   if(savedProgress) screen = 'resume';
